@@ -32,7 +32,7 @@ func (b *Builder) handleRun(args []string, heredoc string) error {
 	errChan := make(chan error)
 	go func() {
 		// FIXME(vdemeester) handle errors
-		errChan <- b.helper.ContainerAttachRaw(ctx, c.ID, strings.NewReader(heredoc), os.Stdout, os.Stderr, true)
+		errChan <- b.helper.ContainerAttach(ctx, c.ID, strings.NewReader(heredoc), os.Stdout, os.Stderr)
 	}()
 
 	// Start the container
@@ -45,7 +45,7 @@ func (b *Builder) handleRun(args []string, heredoc string) error {
 	}
 
 	// Commit the container and remove it
-	imageID, err := b.helper.Commit(ctx, c.ID, types.ContainerCommitOptions{
+	imageID, err := b.helper.ContainerCommit(ctx, c.ID, types.ContainerCommitOptions{
 		Changes: []string{
 			fmt.Sprintf("CMD %v", b.currentCmd),
 			fmt.Sprintf("ENTRYPOINT %v", b.currentEntrypoint),
@@ -56,7 +56,7 @@ func (b *Builder) handleRun(args []string, heredoc string) error {
 	}
 	b.currentImage = imageID
 
-	if err := b.helper.ContainerRm(ctx, c.ID, types.ContainerRemoveOptions{
+	if err := b.helper.ContainerRemove(ctx, c.ID, types.ContainerRemoveOptions{
 		Force: true,
 	}); err != nil {
 		return err

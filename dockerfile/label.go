@@ -30,13 +30,13 @@ func (b *Builder) handleLabel(args []string, heredoc string) error {
 	}
 
 	// Commit the container and remove it
-	imageID, err := b.helper.Commit(ctx, c.ID, types.ContainerCommitOptions{})
+	imageID, err := b.helper.ContainerCommit(ctx, c.ID, types.ContainerCommitOptions{})
 	if err != nil {
 		return err
 	}
 	b.currentImage = imageID
 
-	if err := b.helper.ContainerRm(ctx, c.ID, types.ContainerRemoveOptions{
+	if err := b.helper.ContainerRemove(ctx, c.ID, types.ContainerRemoveOptions{
 		Force: true,
 	}); err != nil {
 		return err

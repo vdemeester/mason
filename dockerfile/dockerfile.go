@@ -14,8 +14,8 @@ import (
 	log "github.com/Sirupsen/logrus"
 	"github.com/docker/engine-api/client"
 	"github.com/docker/engine-api/types/strslice"
+	"github.com/vdemeester/mason/base"
 	"github.com/vdemeester/mason/dockerfile/parser"
-	"github.com/vdemeester/mason/helper"
 )
 
 // DefaultDockerfile holds the default name for a Dockerfile
@@ -25,7 +25,7 @@ type handlerFunc func(args []string, heredoc string) error
 
 // Builder holds attributes and defines method to build Dockerfile
 type Builder struct {
-	helper           *helper.Builder
+	helper           base.Helper
 	contextDirectory string
 	dockerfilePath   string
 	references       []string
@@ -55,7 +55,7 @@ func NewBuilder(c client.APIClient, contextDirectory, dockerfilePath string, tag
 		return nil, fmt.Errorf("invalid specified references : %v", tags)
 	}
 	builder := &Builder{
-		helper:           helper.NewBuilder(c),
+		helper:           base.NewHelper(c),
 		contextDirectory: contextDirectory,
 		dockerfilePath:   dockerfilePath,
 		references:       tags,

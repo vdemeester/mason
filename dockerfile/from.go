@@ -13,7 +13,7 @@ func (b *Builder) handleFrom(args []string, heredoc string) error {
 		return fmt.Errorf("FROM support only one arguments, got %#v", args)
 	}
 
-	image, err := b.helper.GetParentImage(context.Background(), args[0], types.ImagePullOptions{})
+	image, err := b.helper.GetImage(context.Background(), args[0], types.ImagePullOptions{})
 	if err != nil {
 		return err
 	}
