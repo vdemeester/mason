@@ -41,10 +41,6 @@ else
     export DOCKER_HOST="$DOCKER_TEST_HOST"
 fi
 
-echo docker host $DOCKER_HOST
-echo docker test host $DOCKER_TEST_HOST
-cat $DEST/docker.log
-
 # give it a second to come up so it's "ready"
 tries=5
 while ! docker version &> /dev/null; do

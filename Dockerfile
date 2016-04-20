@@ -30,10 +30,6 @@ RUN set -e; \
 
 WORKDIR /go/src/github.com/vdemeester/mason
 
-COPY glide.yaml glide.yaml
-COPY glide.lock glide.lock
-RUN glide install
-
 # Wrap all commands in the "docker-in-docker" script to allow nested containers
 ENTRYPOINT ["hack/dind"]
 
