@@ -1,0 +1,19 @@
+stages:
+  - test-unit
+  - build
+  - test-integration
+
+test-unit:
+  stage: test-unit
+  script:
+    - make test-unit
+
+binary:
+  stage: build
+  script:
+    - make binary
+
+test-integration:
+  stage: test-integration
+  script:
+    - make test-integration
