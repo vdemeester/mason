@@ -42,7 +42,7 @@ func (h *CreateHelper) ContainerCreate(ctx context.Context, config types.Contain
 func TestStepCreateString(t *testing.T) {
 	step := WithCreate(&ErrorStep{}, []string{}, []string{}, false).(*CreateStep)
 	actual := step.String()
-	expected := "Error (with create)"
+	expected := "Error (with create: [] [])"
 	if actual != expected {
 		t.Fatalf("expected %q, got %q", expected, actual)
 	}
@@ -77,7 +77,7 @@ func TestCreateStep(t *testing.T) {
 		expectedEntrypoint: entrypoint,
 		expectedStdin:      true,
 	}
-	step := WithCreate(&NoopStep{}, cmd, entrypoint, true)
+	step := WithCreate(&NoopStep{}, entrypoint, cmd, true)
 	config, err := step.Execute(context.Background(), helper, &Config{})
 	if err != nil {
 		t.Fatal(err)

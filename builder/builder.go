@@ -1,6 +1,7 @@
 package builder
 
 import (
+	"fmt"
 	"sync"
 
 	"golang.org/x/net/context"
@@ -76,6 +77,9 @@ type StepBuilder struct {
 func (b *StepBuilder) Run(ctx context.Context) (string, error) {
 	for stepNum, step := range b.steps {
 		b.logfunc("Step %d: %s", stepNum, step)
+		if step == nil {
+			return "", fmt.Errorf("Step %d is nil", stepNum)
+		}
 		config, err := step.Execute(ctx, b.helper, b.currentConfig)
 		if err != nil {
 			return "", err

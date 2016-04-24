@@ -14,11 +14,11 @@ import (
 const ContainerID = "containerID"
 
 // WithCreate creates a Create step with the specified step (and argumeents)
-func WithCreate(step Step, cmd, entrypoint []string, stdin bool) Step {
+func WithCreate(step Step, entrypoint, cmd []string, stdin bool) Step {
 	return &CreateStep{
 		delegateStep: step,
-		Cmd:          cmd,
 		Entrypoint:   entrypoint,
+		Cmd:          cmd,
 		Stdin:        stdin,
 	}
 }
@@ -33,7 +33,7 @@ type CreateStep struct {
 }
 
 func (s *CreateStep) String() string {
-	return fmt.Sprintf("%s (with create)", s.delegateStep)
+	return fmt.Sprintf("%s (with create: %s %s)", s.delegateStep, s.Entrypoint, s.Cmd)
 }
 
 // Execute implements Step.Execute. It executes the step based on the specified config and helper.

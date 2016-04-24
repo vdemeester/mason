@@ -13,11 +13,11 @@ import (
 // no other step executed before. It will get the specified image and put it
 // into the builder config.
 type FromStep struct {
-	ref string
+	Reference string
 }
 
 func (s *FromStep) String() string {
-	return fmt.Sprintf("FROM %s", s.ref)
+	return fmt.Sprintf("FROM %s", s.Reference)
 }
 
 // Execute implements Step.Execute. It executes the step based on the specified config and helper.
@@ -26,7 +26,7 @@ func (s *FromStep) Execute(ctx context.Context, helper base.Helper, config *Conf
 	if config.ImageID != "" {
 		return nil, fmt.Errorf("From step should be the first step, was not.")
 	}
-	image, err := helper.GetImage(ctx, s.ref, types.ImagePullOptions{})
+	image, err := helper.GetImage(ctx, s.Reference, types.ImagePullOptions{})
 	if err != nil {
 		return nil, err
 	}

@@ -13,8 +13,9 @@ import (
 
 	log "github.com/Sirupsen/logrus"
 	"github.com/docker/engine-api/client"
-	"github.com/docker/engine-api/types/strslice"
+	// "github.com/docker/engine-api/types/strslice"
 	"github.com/vdemeester/mason/base"
+	"github.com/vdemeester/mason/builder"
 	"github.com/vdemeester/mason/dockerfile/parser"
 )
 
@@ -30,12 +31,6 @@ type Builder struct {
 	dockerfilePath   string
 	references       []string
 	out              io.Writer
-
-	currentImage      string
-	currentEntrypoint strslice.StrSlice
-	currentCmd        strslice.StrSlice
-
-	handlers map[string]handlerFunc
 }
 
 // NewBuilder creates a new Dockerfile Build with the specified arguments.
@@ -62,13 +57,6 @@ func NewBuilder(c client.APIClient, contextDirectory, dockerfilePath string, tag
 		out:              os.Stdout,
 	}
 
-	builder.handlers = map[string]handlerFunc{
-		"FROM":  builder.handleFrom,
-		"LABEL": builder.handleLabel,
-		"RUN":   builder.handleRun,
-		"COPY":  builder.handleCopy,
-	}
-
 	return builder, nil
 }
 
@@ -86,15 +74,16 @@ func (b *Builder) Run() error {
 		return fmt.Errorf("no commands found in Dockerfile")
 	}
 
-	for stepNum, command := range commands {
-		if err := b.dispatch(stepNum, command); err != nil {
-			return err
-		}
+	build := builder.WithSteps(builder.WithLogFunc(builder.NewBuilder(b.helper), log.Infof), b.toSteps(commands))
+
+	image, err := build.Run(context.Background())
+	if err != nil {
+		return err
 	}
 
 	for _, ref := range b.references {
-		log.Infof("Tag image %s with reference %s", b.currentImage, ref)
-		if err := b.helper.TagImage(context.Background(), b.currentImage, ref); err != nil {
+		log.Infof("Tag image %s with reference %s", image, ref)
+		if err := b.helper.TagImage(context.Background(), image, ref); err != nil {
 			return err
 		}
 	}
@@ -102,26 +91,46 @@ func (b *Builder) Run() error {
 	return nil
 }
 
-func (b *Builder) dispatch(stepNum int, command *parser.Command) error {
-	cmd, args := strings.ToUpper(command.Args[0]), command.Args[1:]
-
-	if (stepNum == 0) != (cmd == "FROM") {
-		return fmt.Errorf("FROM must be the first Dockerfile command")
+func (b *Builder) toSteps(commands []*parser.Command) []builder.Step {
+	steps := make([]builder.Step, len(commands))
+	for i, command := range commands {
+		var step builder.Step
+		cmd, args := strings.ToUpper(command.Args[0]), command.Args[1:]
+		switch cmd {
+		case "FROM":
+			step = &builder.FromStep{
+				Reference: args[0],
+			}
+		case "COPY":
+			step = builder.WithRemove(
+				builder.WithCommit(
+					builder.WithCreate(&CopyStep{
+						srcPath:     args[0],
+						destPath:    args[1],
+						contextPath: b.contextDirectory,
+					}, []string{}, []string{}, false),
+				),
+			)
+		case "RUN":
+			step = builder.WithRemove(
+				builder.WithCommit(
+					builder.WithCreate(&RunStep{
+						heredoc: command.Heredoc,
+					}, args[:1], args[1:], true),
+				),
+			)
+		case "LABEL":
+			step = builder.WithRemove(
+				builder.WithCommit(&LabelStep{
+					labels: map[string]string{
+						args[0]: args[1],
+					},
+				}),
+			)
+		}
+		steps[i] = step
 	}
-
-	handler, exists := b.handlers[cmd]
-	if !exists {
-		return fmt.Errorf("unknown command: %q", cmd)
-	}
-
-	log.Infof("Step %d: %#v\n", stepNum, command)
-	// FIXME(vdemeester) do way more..
-	if err := handler(args, command.Heredoc); err != nil {
-		return err
-	}
-	log.Infof("--> %s", b.currentImage)
-
-	return nil
+	return steps
 }
 
 func validateReferences(references []string) error {

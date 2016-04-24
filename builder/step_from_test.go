@@ -29,7 +29,7 @@ func (h *FromHelper) GetImage(ctx context.Context, ref string, options types.Ima
 
 func TestFromStepString(t *testing.T) {
 	step := &FromStep{
-		ref: "reference",
+		Reference: "reference",
 	}
 	actual := step.String()
 	expected := "FROM reference"
@@ -41,7 +41,7 @@ func TestFromStepString(t *testing.T) {
 func TestFromStepWithImageIDNotEmptyError(t *testing.T) {
 	helper := &FromHelper{}
 	step := &FromStep{
-		ref: "reference",
+		Reference: "reference",
 	}
 	_, err := step.Execute(context.Background(), helper, &Config{
 		ImageID: "image_id",
@@ -54,7 +54,7 @@ func TestFromStepWithImageIDNotEmptyError(t *testing.T) {
 func TestFromStepHelperError(t *testing.T) {
 	helper := &FromHelper{}
 	step := &FromStep{
-		ref: "reference",
+		Reference: "reference",
 	}
 	_, err := step.Execute(context.Background(), helper, &Config{})
 	if err == nil || err != errNoHelper {
@@ -68,7 +68,7 @@ func TestFromStep(t *testing.T) {
 		expectedRef: "reference",
 	}
 	step := &FromStep{
-		ref: "reference",
+		Reference: "reference",
 	}
 	config, err := step.Execute(context.Background(), helper, &Config{})
 	if err != nil {
