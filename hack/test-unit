@@ -48,5 +48,6 @@ if [ "${#TESTS_FAILED[@]}" -gt 0 ]; then
 else
     echo "${GREEN}Test success${TEXTRESET}"
     echo
+    bash <(curl -s https://codecov.io/bash)
     true
 fi
