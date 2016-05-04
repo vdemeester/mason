@@ -13,3 +13,6 @@ script:
   - make validate
   - make binary
   - make DAEMON_VERSION="all" test
+
+after_success:
+  - bash <(curl -s https://codecov.io/bash)
