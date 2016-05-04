@@ -19,7 +19,7 @@ find_dirs() {
          \) -name "$1" -print0 | xargs -0n1 dirname | sort -u
 }
 
-TESTFLAGS="-cover -coverprofile=cover.out ${TESTFLAGS}"
+TESTFLAGS="-cover -coverprofile=.coverage.out ${TESTFLAGS}"
 
 if [ -z "$TESTDIRS" ]; then
     TESTDIRS=$(find_dirs '*_test.go')
@@ -30,6 +30,7 @@ TESTS_FAILED=()
 for dir in $TESTDIRS; do
     echo '+ go test' $TESTFLAGS "${dir}"
     go test ${TESTFLAGS} ${dir}
+    bash <(curl -s https://codecov.io/bash)
     if [ $? != 0 ]; then
         TESTS_FAILED+=("$dir")
         echo
@@ -48,6 +49,5 @@ if [ "${#TESTS_FAILED[@]}" -gt 0 ]; then
 else
     echo "${GREEN}Test success${TEXTRESET}"
     echo
-    bash <(curl -s https://codecov.io/bash)
     true
 fi
