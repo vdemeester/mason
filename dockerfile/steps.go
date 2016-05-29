@@ -10,8 +10,8 @@ import (
 
 	"github.com/docker/engine-api/types"
 	"github.com/docker/engine-api/types/container"
-	"github.com/vdemeester/mason/base"
-	"github.com/vdemeester/mason/builder"
+	"github.com/vdemeester/libmason"
+	"github.com/vdemeester/libmason/builder"
 )
 
 // LabelStep is a step for LABEL.
@@ -24,7 +24,7 @@ func (s *LabelStep) String() string {
 }
 
 // Execute implements Step.Execute. It executes the step based on the specified config and helper.
-func (s *LabelStep) Execute(ctx context.Context, helper base.Helper, config *builder.Config) (*builder.Config, error) {
+func (s *LabelStep) Execute(ctx context.Context, helper libmason.Helper, config *builder.Config) (*builder.Config, error) {
 	c, err := helper.ContainerCreate(ctx, types.ContainerCreateConfig{
 		Config: &container.Config{
 			Image:  config.ImageID,
@@ -49,7 +49,7 @@ func (s *RunStep) String() string {
 }
 
 // Execute implements Step.Execute. It executes the step based on the specified config and helper.
-func (s *RunStep) Execute(ctx context.Context, helper base.Helper, config *builder.Config) (*builder.Config, error) {
+func (s *RunStep) Execute(ctx context.Context, helper libmason.Helper, config *builder.Config) (*builder.Config, error) {
 	containerID, ok := config.Get(builder.ContainerID)
 	if !ok {
 		return nil, fmt.Errorf("%s missing in config, cannot commit the container", builder.ContainerID)
@@ -84,7 +84,7 @@ func (s *CopyStep) String() string {
 }
 
 // Execute implements Step.Execute. It executes the step based on the specified config and helper.
-func (s *CopyStep) Execute(ctx context.Context, helper base.Helper, config *builder.Config) (*builder.Config, error) {
+func (s *CopyStep) Execute(ctx context.Context, helper libmason.Helper, config *builder.Config) (*builder.Config, error) {
 	containerID, ok := config.Get(builder.ContainerID)
 	if !ok {
 		return nil, fmt.Errorf("%s missing in config, cannot commit the container", builder.ContainerID)

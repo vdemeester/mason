@@ -14,8 +14,8 @@ import (
 	log "github.com/Sirupsen/logrus"
 	"github.com/docker/engine-api/client"
 	// "github.com/docker/engine-api/types/strslice"
-	"github.com/vdemeester/mason/base"
-	"github.com/vdemeester/mason/builder"
+	"github.com/vdemeester/libmason"
+	"github.com/vdemeester/libmason/builder"
 	"github.com/vdemeester/mason/dockerfile/parser"
 )
 
@@ -26,7 +26,7 @@ type handlerFunc func(args []string, heredoc string) error
 
 // Builder holds attributes and defines method to build Dockerfile
 type Builder struct {
-	helper           base.Helper
+	helper           libmason.Helper
 	contextDirectory string
 	dockerfilePath   string
 	references       []string
@@ -50,7 +50,7 @@ func NewBuilder(c client.APIClient, contextDirectory, dockerfilePath string, tag
 		return nil, fmt.Errorf("invalid specified references : %v", tags)
 	}
 	builder := &Builder{
-		helper:           base.NewHelper(c),
+		helper:           libmason.NewHelper(c),
 		contextDirectory: contextDirectory,
 		dockerfilePath:   dockerfilePath,
 		references:       tags,

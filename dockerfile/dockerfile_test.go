@@ -3,7 +3,7 @@ package dockerfile
 import (
 	"testing"
 
-	"github.com/vdemeester/mason/test"
+	"github.com/vdemeester/libmason/test"
 )
 
 func TestNewBuilder(t *testing.T) {
