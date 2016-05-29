@@ -30,7 +30,6 @@ TESTS_FAILED=()
 for dir in $TESTDIRS; do
     echo '+ go test' $TESTFLAGS "${dir}"
     go test ${TESTFLAGS} ${dir}
-    bash <(curl -s https://codecov.io/bash)
     if [ $? != 0 ]; then
         TESTS_FAILED+=("$dir")
         echo
