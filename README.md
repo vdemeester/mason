@@ -3,6 +3,7 @@
 [![Build Status](https://travis-ci.org/vdemeester/mason.svg?branch=master)](https://travis-ci.org/vdemeester/mason)
 [![Go Report Card](https://goreportcard.com/badge/github.com/vdemeester/mason)](https://goreportcard.com/report/github.com/vdemeester/mason)
 [![License](https://img.shields.io/github/license/vdemeester/mason.svg)]()
+[![codecov](https://codecov.io/gh/vdemeester/mason/branch/master/graph/badge.svg)](https://codecov.io/gh/vdemeester/mason)
 
 Mason an helper to build client-driven docker container image
 builder. *It is still very experimental*.
