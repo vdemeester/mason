@@ -73,6 +73,11 @@ type ContainerRemoveOptions struct {
 	Force         bool
 }
 
+// ContainerStartOptions holds parameters to start containers.
+type ContainerStartOptions struct {
+	CheckpointID string
+}
+
 // CopyToContainerOptions holds information
 // about files to copy into a container
 type CopyToContainerOptions struct {
@@ -213,11 +218,7 @@ type ImageSearchOptions struct {
 	RegistryAuth  string
 	PrivilegeFunc RequestPrivilegeFunc
 	Filters       filters.Args
-}
-
-// ImageTagOptions holds parameters to tag an image
-type ImageTagOptions struct {
-	Force bool
+	Limit         int
 }
 
 // ResizeOptions holds parameters to resize a tty.
@@ -238,4 +239,26 @@ type VersionResponse struct {
 // and parse the information received. It returns false otherwise.
 func (v VersionResponse) ServerOK() bool {
 	return v.Server != nil
+}
+
+// NodeListOptions holds parameters to list  nodes with.
+type NodeListOptions struct {
+	Filter filters.Args
+}
+
+// ServiceCreateResponse contains the information returned to a client
+// on the  creation of a new service.
+type ServiceCreateResponse struct {
+	// ID is the ID of the created service.
+	ID string
+}
+
+// ServiceListOptions holds parameters to list  services with.
+type ServiceListOptions struct {
+	Filter filters.Args
+}
+
+// TaskListOptions holds parameters to list  tasks with.
+type TaskListOptions struct {
+	Filter filters.Args
 }

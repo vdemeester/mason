@@ -12,7 +12,6 @@ import (
 	"golang.org/x/net/context"
 
 	log "github.com/Sirupsen/logrus"
-	"github.com/docker/engine-api/client"
 	// "github.com/docker/engine-api/types/strslice"
 	"github.com/vdemeester/libmason"
 	"github.com/vdemeester/libmason/builder"
@@ -34,7 +33,7 @@ type Builder struct {
 }
 
 // NewBuilder creates a new Dockerfile Build with the specified arguments.
-func NewBuilder(c client.APIClient, contextDirectory, dockerfilePath string, tags []string) (*Builder, error) {
+func NewBuilder(c libmason.DockerClient, contextDirectory, dockerfilePath string, tags []string) (*Builder, error) {
 	// Validate that the context is a directory
 	if err := validateContextDirectory(contextDirectory); err != nil {
 		return nil, fmt.Errorf("unable to access build context directory: %s", err)
