@@ -18,75 +18,16 @@ that actual ready-to-use binaries.
 It uses [engine-api](https://github.com/docker/engine-api) and is
 pretty tied to it (some structs of `engine-api` are popping up for now).
 
-## Helpers & Builders
+It is based on [libmason](https://github.com/vdemeester/libmason)
+which provides helpers to create your own client-side buildler.
 
-As previously said, `mason` provides some helpers to create
-client-side builders, from the most low-level (almost `API` level) to
-some higher level (with concept of Steps, commit/non-commit step,
-etc…). Those *helpers* are designed to be composable.
+## TODO
 
-### Base
-
-The base Helper is located in the `base` package. It's a low level
-interface (and implementation) of commands that might be needed for a
-builder (get the image, create a container, commit a container to an
-image, etc.).
-
-```go
-import (
-    "github.com/vdemeester/mason/base"
-    "github.com/docker/engine-api/types"
-    "github.com/docker/engine-api/types/container"
-)
-// […]
-
-helper := base.Newhelper(client)
-// […]
-
-image, err := helper.GetImage(context.Background(), "busybox", types.ImagePullOptions{})
-// […]
-
-resp, err := helper.ContainerCreate(context.Background(), types.ContainerCreateConfig{
-    Config: &container.Config{
-        Image: image.ID,
-    }
-}
-// […]
-
-imageID, err := helper.ContainerCommit(context.Background, resp.ID, types.ContainerCommitOptions{})
-// […]
-```
-
-### Step
-
-The `builder` package currently holds a `StepBuilder` which consists
-of a composition of Step executed in order.
-
-```go
-import (
-    "github.com/vdemeester/mason/builder"
-)
-// […]
-
-steps := []Step{
-    &MyStep{},
-    // A step with that needs to create a container
-    builder.WithDefaultCreate(&AnotherStep{}),
-    // A step that will commit the container
-    builder.WithCommit(&AThirdStep{}),
-    // Or remove the container
-    builder.WithRemove(&AFourthStep{}),
-    // Or all of them ?
-    builder.WithCreate(build.WithCommitAndRemove(&MyStep{})),
-}
-
-builder := builder.WithSteps(builder.DefaultBuilder(client))
-image, err := builder.Run()
-// […]
-```
-
-See the [godoc](https://godoc.org/github.com/vdemeester/mason) on how to create steps.
-
-## Binary
-
-Mason currently holds a binary too, mostly to show off :P.
+- Features to support
+    - [ ] Build cache mechanism (probably in `libmason` as it's mostly
+      related to the `Step` builder)
+- Builders
+    - [ ] `dockerfile`: `Dockerfile` reference implementation
+    - [ ] `dockramp`: `Dockerfile` *dockramp* divergence 👼
+    - [ ] `to-be-named`: Enhanced `Dockerfile` that support more
+      commands (like auto-commit, squashing, …)
