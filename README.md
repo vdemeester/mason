@@ -29,6 +29,9 @@ which provides helpers to create your own client-side buildler.
       related to the `Step` builder)
 - Builders
     - [ ] `dockerfile`: `Dockerfile` reference implementation
+        - [ ] Add `build-arg` support
+        - [ ] Support Windows build (at least for `dockerfile`
+          builder)
     - [ ] `dockramp`: `Dockerfile` *dockramp* divergence 👼
     - [ ] `to-be-named`: Enhanced `Dockerfile` that support more
       commands (like auto-commit, squashing, …)
