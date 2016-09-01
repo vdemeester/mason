@@ -7,15 +7,16 @@ import (
 	"io"
 	"os"
 	"path/filepath"
-	"strings"
+	// "strings"
 
 	"golang.org/x/net/context"
 
 	log "github.com/Sirupsen/logrus"
 	// "github.com/docker/engine-api/types/strslice"
+	"github.com/docker/docker/builder/dockerfile/parser"
 	"github.com/vdemeester/libmason"
 	"github.com/vdemeester/libmason/builder"
-	"github.com/vdemeester/mason/dockerfile/parser"
+	// "gtihub.com/docker/docker/builder/dockerfile"
 )
 
 // DefaultDockerfile holds the default name for a Dockerfile
@@ -65,15 +66,16 @@ func (b *Builder) Run() error {
 	if err != nil {
 		return fmt.Errorf("unable to open Dockerfile: %s", err)
 	}
-	commands, err := parser.Parse(dockerfile)
+	builderNode, err := parser.Parse(dockerfile)
 	if err != nil {
 		return fmt.Errorf("unable to parse Dockerfile: %s", err)
 	}
-	if len(commands) == 0 {
-		return fmt.Errorf("no commands found in Dockerfile")
-	}
 
-	build := builder.WithSteps(builder.WithLogFunc(builder.NewBuilder(b.helper), log.Infof), b.toSteps(commands))
+	steps, err := b.toSteps(builderNode)
+	if err != nil {
+		return err
+	}
+	build := builder.WithSteps(builder.WithLogFunc(builder.NewBuilder(b.helper), log.Infof), steps)
 
 	image, err := build.Run(context.Background())
 	if err != nil {
@@ -90,46 +92,80 @@ func (b *Builder) Run() error {
 	return nil
 }
 
-func (b *Builder) toSteps(commands []*parser.Command) []builder.Step {
-	steps := make([]builder.Step, len(commands))
-	for i, command := range commands {
+func (b *Builder) toSteps(node *parser.Node) ([]builder.Step, error) {
+	steps := []builder.Step{}
+	for i, n := range node.Children {
+		// FIXME(vdemeester) handle children of children ?
+		// TODO(vdemeester) handle build-arg, envs, onbuild, …
+		fmt.Printf("%d: n: %+v\n%+v", i, n, n.Next)
 		var step builder.Step
-		cmd, args := strings.ToUpper(command.Args[0]), command.Args[1:]
-		switch cmd {
-		case "FROM":
+		switch n.Value {
+		case "from":
 			step = &builder.FromStep{
-				Reference: args[0],
+				Reference: n.Next.Value,
 			}
-		case "COPY":
+		case "copy":
 			step = builder.WithRemove(
 				builder.WithCommit(
 					builder.WithCreate(&CopyStep{
-						srcPath:     args[0],
-						destPath:    args[1],
+						srcPath:     n.Next.Value,
+						destPath:    n.Next.Next.Value,
 						contextPath: b.contextDirectory,
 					}, []string{}, []string{}, false),
 				),
 			)
-		case "RUN":
-			step = builder.WithRemove(
-				builder.WithCommit(
-					builder.WithCreate(&RunStep{
-						heredoc: command.Heredoc,
-					}, args[:1], args[1:], true),
-				),
-			)
-		case "LABEL":
+		case "run":
+			// FIXME(vdemeester) implement this
+		case "label":
 			step = builder.WithRemove(
 				builder.WithCommit(&LabelStep{
 					labels: map[string]string{
-						args[0]: args[1],
+						n.Next.Value: n.Next.Next.Value,
 					},
 				}),
 			)
+		default:
 		}
-		steps[i] = step
+		steps = append(steps, step)
 	}
-	return steps
+	// for i, command := range commands {
+	// 	var step builder.Step
+	// 	cmd, args := strings.ToUpper(command.Args[0]), command.Args[1:]
+	// 	switch cmd {
+	// 	case "FROM":
+	// 		step = &builder.FromStep{
+	// 			Reference: args[0],
+	// 		}
+	// 	case "COPY":
+	// 		step = builder.WithRemove(
+	// 			builder.WithCommit(
+	// 				builder.WithCreate(&CopyStep{
+	// 					srcPath:     args[0],
+	// 					destPath:    args[1],
+	// 					contextPath: b.contextDirectory,
+	// 				}, []string{}, []string{}, false),
+	// 			),
+	// 		)
+	// 	case "RUN":
+	// 		step = builder.WithRemove(
+	// 			builder.WithCommit(
+	// 				builder.WithCreate(&RunStep{
+	// 					heredoc: command.Heredoc,
+	// 				}, args[:1], args[1:], true),
+	// 			),
+	// 		)
+	// 	case "LABEL":
+	// 		step = builder.WithRemove(
+	// 			builder.WithCommit(&LabelStep{
+	// 				labels: map[string]string{
+	// 					args[0]: args[1],
+	// 				},
+	// 			}),
+	// 		)
+	// 	}
+	// 	steps[i] = step
+	// }
+	return steps, nil
 }
 
 func validateReferences(references []string) error {

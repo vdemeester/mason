@@ -8,13 +8,14 @@ import (
 
 	"github.com/docker/engine-api/types"
 	"github.com/docker/engine-api/types/container"
-	"github.com/docker/engine-api/types/filters"
 	"github.com/docker/engine-api/types/network"
 	"github.com/docker/engine-api/types/registry"
+	"github.com/vdemeester/libmason"
 )
 
 var (
-	errNoEngine = errors.New("Engine no longer exists")
+	errNoEngine                       = errors.New("Engine no longer exists")
+	_           libmason.DockerClient = (*NopClient)(nil)
 )
 
 // NopClient is a nop API Client based on engine-api
@@ -29,21 +30,6 @@ func NewNopClient() *NopClient {
 // ClientVersion returns the version string associated with this instance of the Client
 func (client *NopClient) ClientVersion() string {
 	return ""
-}
-
-// CheckpointCreate creates a checkpoint from the given container with the given name
-func (client *NopClient) CheckpointCreate(ctx context.Context, container string, options types.CheckpointCreateOptions) error {
-	return errNoEngine
-}
-
-// CheckpointDelete deletes the checkpoint with the given name from the given container
-func (client *NopClient) CheckpointDelete(ctx context.Context, container string, checkpointID string) error {
-	return errNoEngine
-}
-
-// CheckpointList returns the volumes configured in the docker host.
-func (client *NopClient) CheckpointList(ctx context.Context, container string) ([]types.Checkpoint, error) {
-	return []types.Checkpoint{}, errNoEngine
 }
 
 // ContainerAttach attaches a connection to a container in the server
@@ -196,11 +182,6 @@ func (client *NopClient) CopyToContainer(ctx context.Context, container, path st
 	return errNoEngine
 }
 
-// Events returns a stream of events in the daemon in a ReadCloser
-func (client *NopClient) Events(ctx context.Context, options types.EventsOptions) (io.ReadCloser, error) {
-	return nil, errNoEngine
-}
-
 // ImageBuild sends request to the daemon to build images
 func (client *NopClient) ImageBuild(ctx context.Context, context io.Reader, options types.ImageBuildOptions) (types.ImageBuildResponse, error) {
 	return types.ImageBuildResponse{}, errNoEngine
@@ -263,84 +244,5 @@ func (client *NopClient) ImageSave(ctx context.Context, images []string) (io.Rea
 
 // ImageTag tags an image in the docker host
 func (client *NopClient) ImageTag(ctx context.Context, image, ref string, options types.ImageTagOptions) error {
-	return errNoEngine
-}
-
-// Info returns information about the docker server
-func (client *NopClient) Info(ctx context.Context) (types.Info, error) {
-	return types.Info{}, errNoEngine
-}
-
-// NetworkConnect connects a container to an existent network in the docker host
-func (client *NopClient) NetworkConnect(ctx context.Context, networkID, container string, config *network.EndpointSettings) error {
-	return errNoEngine
-}
-
-// NetworkCreate creates a new network in the docker host
-func (client *NopClient) NetworkCreate(ctx context.Context, name string, options types.NetworkCreate) (types.NetworkCreateResponse, error) {
-	return types.NetworkCreateResponse{}, errNoEngine
-}
-
-// NetworkDisconnect disconnects a container from an existent network in the docker host
-func (client *NopClient) NetworkDisconnect(ctx context.Context, networkID, container string, force bool) error {
-	return errNoEngine
-}
-
-// NetworkInspect returns the information for a specific network configured in the docker host
-func (client *NopClient) NetworkInspect(ctx context.Context, networkID string) (types.NetworkResource, error) {
-	return types.NetworkResource{}, errNoEngine
-}
-
-// NetworkInspectWithRaw returns the information for a specific network configured in the docker host and it's raw representation.
-func (client *NopClient) NetworkInspectWithRaw(ctx context.Context, networkID string) (types.NetworkResource, []byte, error) {
-	return types.NetworkResource{}, []byte{}, errNoEngine
-}
-
-// NetworkList returns the list of networks configured in the docker host
-func (client *NopClient) NetworkList(ctx context.Context, options types.NetworkListOptions) ([]types.NetworkResource, error) {
-	return nil, errNoEngine
-}
-
-// NetworkRemove removes an existent network from the docker host
-func (client *NopClient) NetworkRemove(ctx context.Context, networkID string) error {
-	return errNoEngine
-}
-
-// RegistryLogin authenticates the docker server with a given docker registry
-func (client *NopClient) RegistryLogin(ctx context.Context, auth types.AuthConfig) (types.AuthResponse, error) {
-	return types.AuthResponse{}, errNoEngine
-}
-
-// ServerVersion returns information of the docker client and server host
-func (client *NopClient) ServerVersion(ctx context.Context) (types.Version, error) {
-	return types.Version{}, errNoEngine
-}
-
-// UpdateClientVersion updates the version string associated with this instance of the Client
-func (client *NopClient) UpdateClientVersion(v string) {
-}
-
-// VolumeCreate creates a volume in the docker host
-func (client *NopClient) VolumeCreate(ctx context.Context, options types.VolumeCreateRequest) (types.Volume, error) {
-	return types.Volume{}, errNoEngine
-}
-
-// VolumeInspect returns the information about a specific volume in the docker host
-func (client *NopClient) VolumeInspect(ctx context.Context, volumeID string) (types.Volume, error) {
-	return types.Volume{}, errNoEngine
-}
-
-// VolumeInspectWithRaw returns the information about a specific volume in the docker host and it's raw representation
-func (client *NopClient) VolumeInspectWithRaw(ctx context.Context, volumeID string) (types.Volume, []byte, error) {
-	return types.Volume{}, []byte{}, errNoEngine
-}
-
-// VolumeList returns the volumes configured in the docker host
-func (client *NopClient) VolumeList(ctx context.Context, filter filters.Args) (types.VolumesListResponse, error) {
-	return types.VolumesListResponse{}, errNoEngine
-}
-
-// VolumeRemove removes a volume from the docker host
-func (client *NopClient) VolumeRemove(ctx context.Context, volumeID string) error {
 	return errNoEngine
 }
