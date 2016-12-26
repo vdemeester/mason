@@ -7,7 +7,7 @@ import (
 
 	"github.com/docker/engine-api/client"
 	"github.com/spf13/cobra"
-	"github.com/vdemeester/mason/dockerfile"
+	"github.com/vdemeester/mason/builder/dockerfile"
 
 	log "github.com/Sirupsen/logrus"
 )
