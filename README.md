@@ -1,4 +1,4 @@
-# Mason
+# Mason 🐳 👷 
 [![GoDoc](https://godoc.org/github.com/vdemeester/mason?status.png)](https://godoc.org/github.com/vdemeester/mason)
 [![Build Status](https://travis-ci.org/vdemeester/mason.svg?branch=master)](https://travis-ci.org/vdemeester/mason)
 [![Go Report Card](https://goreportcard.com/badge/github.com/vdemeester/mason)](https://goreportcard.com/report/github.com/vdemeester/mason)
